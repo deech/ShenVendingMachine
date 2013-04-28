@@ -1,4 +1,3 @@
-(defmacro cl-call [cl F] -> [[protect READ-FROM-STRING] [[protect STRING-UPCASE] F]])
 (package native-calls [my-reverse load-lisp readtable]
 (define load-lisp
   File -> (trap-error

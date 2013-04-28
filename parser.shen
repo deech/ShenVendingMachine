@@ -7,7 +7,24 @@
   buy
   cancel
 *\
-(package parser [<instructions>]
+(package parser (append (external initial) [<instructions> <ip-address>])
+  \* IP Address parser *\
+  (defcc <ip-address>
+    <octet-1> shen.<stop>
+    <octet-2> shen.<stop>
+    <octet-3> shen.<stop>
+    <octet-4>             := [<octet-1> <octet-2> <octet-3> <octet-4>];
+    <e>;)
+  
+  (defcc <octet-1> <octet> := <octet>;)
+  (defcc <octet-2> <octet> := <octet>;)
+  (defcc <octet-3> <octet> := <octet>;)
+  (defcc <octet-4> <octet> := <octet>;)
+  
+  (defcc <octet>
+    shen.<digits> := (let Number (shen.pre (reverse shen.<digits>) 0)
+  		     (if (<= Number 255 ) Number (error "Not an octet: ~A" Number))))
+
   \* command parser *\
   (defcc <sudo>
     sudo;

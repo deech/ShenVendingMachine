@@ -1,6 +1,3 @@
 (in-package :cl-user)
 (quicklisp:quickload "usocket")
-(defun start (host port)
-  (usocket:socket-listen host port))
-(defun stop (socket)
-  (usocket:socket-close socket))
+(quicklisp:quickload "sb-concurrency")

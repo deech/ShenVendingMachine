@@ -23,7 +23,7 @@
   
   (defcc <octet>
     shen.<digits> := (let Number (shen.pre (reverse shen.<digits>) 0)
-  		     (if (<= Number 255 ) Number (error "Not an octet: ~A" Number))))
+  		     (if (<= Number 255 ) Number (fail))))
 
   \* command parser *\
   (defcc <sudo>

@@ -1,9 +1,9 @@
+(tc -)
 (cd "/home/deech/Lisp/Shen9/maths-V4/")
 (load "m-lib.shen")
-(cd "/home/deech/Lisp/shenScripts/strings")
-(load "s-lib.shen")
 (cd "/home/deech/Lisp/shenScripts/VendingMachine/")
 (tc -)
+(load "cl-wrappers.shen")
 (load "initial.shen")
 (tc +)
 (load "types.shen")
@@ -11,5 +11,12 @@
 (load "test.shen")
 (tc -)
 (load "parser.shen")
-(load "cl-wrappers.shen")
-(load "server.shen")
+(load "io.shen")
+(tc -)
+
+(define startup
+ -> (let Sock (open-socket "localhost" 8000)
+            (add-to *thread-store* (make-thread (freeze (accept-connection Sock))))))
+(define stop
+  -> (do (stop-server)
+	 (reset)))

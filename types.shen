@@ -14,3 +14,12 @@
   if (== X sudo)
   _______________
   X : user;)
+
+(datatype ip-address
+  if (is-ip-address X)
+  ____________________
+  X : ip-address;)
+
+(datatype network
+  ___________________________
+  (value *my-server*) : socket;)

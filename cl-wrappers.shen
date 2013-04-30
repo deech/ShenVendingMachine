@@ -25,7 +25,9 @@
 		(((protect READ-FROM-STRING) "USOCKET::SOCKET-CLOSE") Sock)
 		(/. E (output "~A" E))))
 (define write-to-stream
-  Stream Response -> (do ((protect WRITE-LINE) Response Stream)
+  Stream Response -> (do ((protect WRITE-LINE) "==Response==" Stream)
+		         ((protect WRITE-LINE) Response Stream)
+			 ((protect WRITE-LINE) "============" Stream)
 			 ((protect FORCE-OUTPUT) Stream)))
 (define read-line
   Stream -> ((protect READ-LINE) Stream NIL NIL))

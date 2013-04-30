@@ -4,9 +4,22 @@
   [KV | KVs] K F       -> (append [KV]           (with-key KVs K F))
   [] K F               -> [])
 
+(define every
+  {(list A) --> (A --> boolean) --> boolean}
+  []       F -> false
+  [A]      F -> (F A)
+  [A | As] F -> (and (F A) (every As F))
+ )
+
+(define elements?
+  {(list A) --> (list A) --> boolean}
+  As Bs -> (every As (/. A (element? A Bs)))
+  )
+
 (define show-alist-h
   { (list (A * B)) --> string --> string }
   [(@p K V) | Is] Accum -> (show-alist-h Is (@s Accum (make-string "~A ~A~%" K V)))
+  [] ""    -> "No contents"
   [] Accum -> Accum)
 
 (define show-alist
@@ -22,10 +35,10 @@
 
 (define process-request
   { state --> command-line --> state --> (string * state * state)}
-  VM [sudo add [currency | Currencies]] US -> (@p "" (@p [] []) (@p [] []))
-  VM [sudo add [candy    | Candies]]    US -> (@p "" (@p [] []) (@p [] []))
-  VM [user add [currency | Currencies]] US -> (@p "" (@p [] []) (@p [] []))
-  VM [user add [candy    | _]]          US -> (@p "Only a super-user can add candy to the machine." VM US)
+  VM [sudo add [currency Currencies]] US -> (@p "" (@p [] []) (@p [] []))
+  VM [sudo add [candy    Candies]]    US -> (@p "" (@p [] []) (@p [] []))
+  VM [user add [currency Currencies]] US -> (@p "" VM (@p (fst US) (add-coins (snd US) [])))
+  VM [user add [candy    _]]          US -> (@p "Only a super-user can add candy to the machine." VM US)
   VM [user list candy] US -> (@p (show-candy US) VM US)
   VM [sudo list candy] US -> (@p (show-candy VM) VM US)
   VM [user list money] US -> (@p (show-coins US) VM US)
@@ -34,11 +47,11 @@
   VM [user cancel] US -> (@p "" (@p [] []) (@p [] []))
   )
 
-\* (define add-coins *\
-\*   { coinStore --> (list currency) --> coinStore } *\
-\*   CoinStore [Coin | Coins] -> (add-coins (add-coin Coin CoinStore) Coins)) *\
+(define add-coins
+  { coinStore --> (list currency) --> coinStore }
+  CoinStore []             -> CoinStore
+  CoinStore Coins -> (add-coins (add-coin CoinStore (head Coins)) (tail Coins)))
 
-
-\* (define add-coin *\
-\*   { coinStore --> currency --> coinStore} *\
-\*   [(@p Coin Number) | Coins] Coin -> (append [(@p Coin (+ Number 1) *\
+(define add-coin
+  { coinStore --> currency --> coinStore}
+  CoinStore Coin -> (with-key CoinStore Coin (+ 1)))

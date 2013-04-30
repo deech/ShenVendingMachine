@@ -23,3 +23,19 @@
 (datatype network
   ___________________________
   (value *my-server*) : socket;)
+(datatype initial-state
+  ____________________________
+  (value *initial-state*) : state;
+
+  X : (candyStore * coinStore);
+  ============================
+  X : state;)
+
+(datatype command-line
+  if (element? sudo X)
+  __________________
+  X : command-line;
+
+  X : command-line;
+  ___________________
+  X : (list symbol);)

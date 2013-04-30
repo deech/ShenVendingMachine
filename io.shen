@@ -1,12 +1,13 @@
 (package nativeCalls (append (external cl-wrapper)
-                             (external parser)
                              (external initial)
                              [ip-address
 			      socket
 			      open-socket
 			      accept-connection
 			      stop-server
-			      is-ip-address])
+			      is-ip-address
+			      parse-command-line
+			      process-request])
 
 (declare open-socket [ip-address --> [number --> socket]])
 (declare accept-connection [symbol --> unit])
@@ -21,7 +22,13 @@
 (define accept-connection
   Sock -> (let Accepted (socket-accept Sock)
             (do (add-to *connectionStore* Accepted)
-		(add-to *thread-store* (pass-on-input Accepted (/. Line "hello")))
+		(add-to *thread-store* (pass-on-input
+					     Accepted
+					     (/. VendingMachine Line UserState (trap-error
+										     (let Command (parse-command-line Line)
+										       (process-request VendingMachine Command UserState))
+									             (/. E (@p (error-to-string E) VendingMachine))))
+					     (@p [] [])))
 		(accept-connection Sock))))
 
 (define stop-server

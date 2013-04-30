@@ -7,14 +7,13 @@
 (load "initial.shen")
 (load "io.shen")
 (load "parser.shen")
-(load "vendingmachineops.shen")
 (tc +)
-(load "types.shen")
+(load "vendingmachinetypes.shen")
 (load "moneyops.shen")
 (load "test.shen")
-(tc -)
+(load "types.shen")
 (load "vendingmachineops.shen")
-
+(tc -)
 (define startup
  -> (let Sock (open-socket "localhost" 8000)
       (do (send-message (value *mailbox*) (value *initial-state*))
@@ -22,3 +21,5 @@
 (define stop
   -> (do (stop-server)
 	 nil))
+
+(tc +)

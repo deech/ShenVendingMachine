@@ -1,5 +1,3 @@
-(synonyms coinStore (list (currency * number)))
-
 (define faceValue
   {currency --> number}
   quarter -> 25
@@ -15,6 +13,10 @@
   {number --> coinStore --> (coinStore * coinStore)}
   Amount Till -> (trap-error (change-h Amount Till [] []) (/. E (@p Till []))))
 
+(define merge-tills
+  { coinStore --> coinStore --> coinStore }
+  Till1 Till2 -> (append Till1 Till2))
+
 (define change-h
   {number -->
    coinStore -->
@@ -24,19 +26,20 @@
   0 OldTill NewTill Change -> (@p (append NewTill OldTill) Change)
   Amount [] _ _ -> (error "Not enough in the till")
   Amount [(@p Coin CoinAmount) | Coins] NewTill Change ->
-            (change-h Amount Coins (append NewTill [(@p Coin CoinAmount)]) Change)
-	    where (> (faceValue Coin) Amount)
+            (change-h Amount Coins (merge-tills NewTill [(@p Coin CoinAmount)]) Change)
+  	    where (> (faceValue Coin) Amount)
   Amount [(@p Coin CoinAmount) | Coins ] NewTill Change ->
             (let CoinsAndLeftover (/mod Amount (faceValue Coin))
-	         Needed           (fst CoinsAndLeftover)
-	         Leftover         (snd CoinsAndLeftover)
-	         EnoughCoins      (< Needed CoinAmount)
-	      (if EnoughCoins
-		  (change-h (- Amount (total (@p Coin Needed)))
-			    Coins
-			    (append NewTill [(@p Coin (- CoinAmount Needed))])
-			    (append Change [(@p Coin Needed)]))
-		  (change-h (- Amount (total (@p Coin CoinAmount)))
-			    Coins
-			    (append NewTill [(@p Coin 0)])
-			    (append Change [(@p Coin CoinAmount)])))))
+  	         Needed           (fst CoinsAndLeftover)
+  	         Leftover         (snd CoinsAndLeftover)
+  	         EnoughCoins      (< Needed CoinAmount)
+  	      (if EnoughCoins
+  		  (change-h (- Amount (total (@p Coin Needed)))
+  			    Coins
+  			    (merge-tills NewTill [(@p Coin (- CoinAmount Needed))])
+  			    (merge-tills Change [(@p Coin Needed)]))
+  		  (change-h (- Amount (total (@p Coin CoinAmount)))
+  			    Coins
+  			    (merge-tills NewTill [(@p Coin 0)])
+  			    (merge-tills Change [(@p Coin CoinAmount)]))))
+  )

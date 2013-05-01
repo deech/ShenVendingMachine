@@ -23,7 +23,7 @@
   <e> := [];)
 (defcc <sudo>
   sudo;
-  := [user];)
+  := user;)
 (defcc <candy>    C := [C] where (element? C (value *candy*));)
 (defcc <currency> C := [C] where (element? C (value *currency*));)
 (defcc <candies>
@@ -44,7 +44,7 @@
   candy;
   money;)
 (defcc <instructions>
-  <sudo> <instruction>;)
+  <sudo> <instruction> := (append <sudo> [<instruction>]);)
 
 (declare parse-command-line [string --> command-line])
 (define parse-command-line

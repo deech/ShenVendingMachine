@@ -1,11 +1,5 @@
-\*
-(defun receive-each (connections)
-  (let ((ready (usocket:wait-for-input connections :timeout 0 :ready-only t)))
-    (loop for connection in ready
-       collect (read-line (usocket:socket-stream connection)))))
-*\
 (load "native-calls.shen")
-(load-lisp "cl-libs.lsp")
+(load-lisp "/home/deech/Lisp/shenScripts/VendingMachine/cl-libs.lsp")
 (package cl-wrapper [*mailbox* socket-listen socket-accept socket-close pass-on-input connection-name make-thread kill-thread send-message receive-message]
 (declare socket-listen [string --> [number --> server]])
 (declare socket-accept [server --> unit])

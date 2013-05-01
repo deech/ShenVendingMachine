@@ -28,7 +28,7 @@
 										     (let Command (parse-command-line Line)
 										       (process-request VendingMachine Command UserState))
 									             (/. E (@p (error-to-string E) VendingMachine))))
-					     (@p [] [])))
+					     (empty-state)))
 		(accept-connection Sock))))
 
 (define stop-server

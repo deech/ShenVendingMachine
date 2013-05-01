@@ -1,6 +1,6 @@
-(synonyms state (candyStore * coinStore)
+(synonyms state      (candyStore * coinStore)
           candyStore (list (candy * number))
-	  coinStore (list (currency * number)))
+	  coinStore  (list (currency * number)))
 
 (datatype globals
   _____________________________
@@ -18,18 +18,29 @@
   ___________________________________
   X : currency;
 
-
   if (element? X (value *candy*))
   ___________________________________
   X : candy;
 
-  X : (list A);
-  _____________________________________________
-  [currency X] : (list currency);
+  _________________________
+  [candy X] : command;
 
-  ____________________________________________________________
-  (elements? X (value *candy*)) : verified >> X : (list candy);
 
-  __________________________________________________________________
-  (elements? X (value *currency*)) : verified >> X : (list currency);
-  )
+  [candy X] : command;
+  _________________________
+  X : (list candy);
+
+  _________________________
+  [buy X] : command;
+
+  [buy X] : command;
+  _____________________
+  X : candy;
+  
+  _______________________
+  [currency X] : command;
+
+
+  [currency X] : command;
+  _______________________
+  X : (list currency);)

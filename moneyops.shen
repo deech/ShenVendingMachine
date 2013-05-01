@@ -5,6 +5,13 @@
   nickel  -> 5
   dollar  -> 100)
 
+(define candy-cost
+  {candy --> number}
+  snickers -> 100
+  twix -> 125
+  hersheys -> 75
+  payday -> 95)
+
 (define total
   {(currency * number) --> number}
   (@p Coin CoinAmount) -> (* (faceValue Coin) CoinAmount))

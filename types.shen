@@ -17,6 +17,8 @@
   (value *my-server*) : socket;)
 
 (datatype command-line
-  if (or (element? sudo X) (element? user X))
   __________________
-  X : command-line;)
+  [sudo X] : command-line;
+
+  ___________________
+  [user X] : command-line;)

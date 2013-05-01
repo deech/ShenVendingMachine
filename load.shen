@@ -12,9 +12,7 @@
 (load "moneyops.shen")
 (load "test.shen")
 (load "types.shen")
-(tc -)
-(load "otherops.shen")
-(tc +)
+(load "utils.shen")
 (load "vendingmachineops.shen")
 (tc -)
 (define startup

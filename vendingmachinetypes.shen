@@ -10,7 +10,8 @@
   (value *currency*) : (list currency);
 
   ____________________________
-  (value *initial-state*) : state;)
+  (value *initial-state*) : state;
+  )
 
 (datatype items
 
@@ -19,28 +20,29 @@
   X : currency;
 
   if (element? X (value *candy*))
-  ___________________________________
+  _______________________________
   X : candy;
 
-  _________________________
+  ____________________
   [candy X] : command;
 
 
   [candy X] : command;
-  _________________________
+  ___________________
   X : (list candy);
 
-  _________________________
+  _________________
   [buy X] : command;
 
   [buy X] : command;
-  _____________________
+  _________________
   X : candy;
-  
+
   _______________________
   [currency X] : command;
 
 
   [currency X] : command;
   _______________________
-  X : (list currency);)
+  X : (list currency);
+  )

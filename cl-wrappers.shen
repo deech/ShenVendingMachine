@@ -26,23 +26,24 @@
 (define read-line
   Stream -> ((protect READ-LINE) Stream NIL NIL))
 (define wait-for-input
-  Connection F UserState Continue? -> Continue? where (= Continue? (protect Done))
-  Connection F UserState Continue? ->
+  Connection F UserState done -> ()
+  Connection F UserState continue ->
       (let Ready (((protect READ-FROM-STRING) "USOCKET::WAIT-FOR-INPUT") Connection)
 	   Stream (((protect READ-FROM-STRING) "USOCKET::SOCKET-STREAM") Ready)
 	   Line  (read-line Stream)
 	(if (= Line NIL)
-	    (wait-for-input Connection F UserState (protect Done))
+	    (wait-for-input Connection F UserState done)
 	    (wait-for-input-h (F (receive-message (value *mailbox*)) Line UserState)
 		              Stream
 			      (value *mailbox*)
-			      (/. NewUserState (wait-for-input Connection F NewUserState (protect Continue))))))
-      where (= Continue? (protect Continue)))
+			      (/. NewUserState (wait-for-input Connection F NewUserState continue)))))
+      )
 (define wait-for-input-h
   (@p UserResponse NewVendingMachine NewUserState) Stream Mailbox RecursiveCall
     -> (do (write-to-stream Stream UserResponse)
 	   (send-message Mailbox NewVendingMachine)
-	   (RecursiveCall NewUserState)))
+	   (RecursiveCall NewUserState))
+   A B C D -> (output "~A ~A ~A ~A" A B C D))
 (define send-response
   (@p UserResponse NewVendingMachine) Stream Mailbox
        -> (do (write-to-stream Stream UserResponse)
@@ -57,7 +58,7 @@
 (define pass-on-input
   Connection F UserState ->
       (make-thread
-	 (freeze (do (wait-for-input Connection F UserState (protect Continue))
+	 (freeze (do (wait-for-input Connection F UserState continue)
 		     (socket-close Connection)))))
 (define receive-message
   Mailbox -> (((protect READ-FROM-STRING) "SB-CONCURRENCY::RECEIVE-MESSAGE") Mailbox))

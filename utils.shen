@@ -53,3 +53,8 @@
 (define show-alist
   { (list (A * B)) --> string }
   Alist -> (show-alist-h Alist ""))
+
+(define print-money
+  { number --> string }
+  Number -> (let DollarPennies(/mod Number 100)
+	      (make-string "~A.~A" (fst DollarPennies) (snd DollarPennies))))

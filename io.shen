@@ -6,6 +6,7 @@
 			      accept-connection
 			      stop-server
 			      is-ip-address
+			      empty-state
 			      parse-command-line
 			      process-request])
 
@@ -24,10 +25,16 @@
             (do (add-to *connectionStore* Accepted)
 		(add-to *thread-store* (pass-on-input
 					     Accepted
-					     (/. VendingMachine Line UserState (trap-error
-										     (let Command (parse-command-line Line)
-										       (process-request VendingMachine Command UserState))
-									             (/. E (@p (error-to-string E) VendingMachine))))
+					     (/. VendingMachine Line UserState
+						 (trap-error
+						       (let Command (parse-command-line Line)
+							 (process-request
+								  VendingMachine
+								  Command
+								  UserState))
+						       (/. E (@p (error-to-string E)
+								 VendingMachine
+								 UserState))))
 					     (empty-state)))
 		(accept-connection Sock))))
 

@@ -8,7 +8,12 @@
 
 (define show-candy
   { state --> string }
-  (@p Candy _) -> (show-alist Candy))
+  (@p Candy _) -> (show-alist
+			(map
+			 (/. CandyStock (@p (fst CandyStock)
+					    [(snd CandyStock)
+					     (candy-cost (fst CandyStock))]))
+			 Candy)))
 
 (define process-request
   { state --> command-line --> state --> (string * state * state)}
@@ -24,8 +29,9 @@
   VM [user [add [candy    _]]]          US -> (@p "Only a super-user can add candy."
 						VM
 						US)
-  VM [user [list candy]] US -> (@p (show-candy US) VM US)
+  VM [user [list candy]] US -> (@p (show-candy VM) VM US)
   VM [sudo [list candy]] US -> (@p (show-candy VM) VM US)
+  VM [sudo [list money]] US -> (@p (show-coins VM) VM US)
   VM [user [list money]] US -> (@p (show-coins US) VM US)
   VM [sudo [buy  _]] US -> (@p "You're a super-user. Your money's no good here." VM US)
   VM [user [buy Candy]] US -> (buy-candy VM US Candy)
@@ -37,12 +43,12 @@
 
 (define remove-candy
   {candy --> candyStore --> candyStore}
-  Candy Store -> (with-key Store Candy (- 1))
+  Candy Store -> (with-key Store Candy (/. Stock (- Stock 1)))
   )
 
 (define enough-candy?
   {candy --> state --> boolean}
-  Candy VM -> (with-lookup Candy (fst VM) (> 0) false)
+  Candy VM -> (with-lookup Candy (fst VM) (/. Stock (> Stock 0)) false)
   )
 
 (define enough-money?
@@ -91,22 +97,37 @@
 				      NewStore (Transform Store)
 				     (PutBack NewStore State)))
 
+(define buy-candy-h
+  { state --> state -->
+    number -->
+    candy -->
+    (coinStore * coinStore) -->
+    (string * state * state) }
+  VM UserState 0 Candy _
+    -> (@p (make-string "Enjoy your ~A" Candy)
+	   (@p (remove-candy Candy (fst VM)) (snd VM))
+	   (@p (fst UserState) (snd (empty-state))))
+  VM UserState Owed Candy (@p NewTill Change)
+    -> (@p (make-string "Enjoy your ~A" Candy)
+	   (@p (remove-candy Candy (fst VM)) NewTill)
+	   (@p (fst UserState) (pad-coinStore Change)))
+  )
+     
+(define pad-coinStore
+  {coinStore --> coinStore}
+  CoinStore -> (merge-alists CoinStore (snd (empty-state)) +))
+
 (define buy-candy
   {state --> state --> candy --> (string * state * state)}
   VM UserState Candy -> (if (enough-money? Candy UserState)
 			    (if (enough-candy? Candy VM)
 				(let MergedVM (add-money VM (snd UserState))
-				     Owed     (- (total-money (snd UserState)) (candy-cost Candy))
+				     Owed     (- (total-money (snd UserState))
+						 (candy-cost Candy))
 				     Change   (change Owed (snd MergedVM))
-				  (if (not (= (snd Change) []))
-				      (@p (make-string "Enjoy your ~A" Candy)
-					  (@p (remove-candy Candy (fst MergedVM)) (fst Change))
-					  (@p (fst UserState) (snd Change)))
-				      (@p "Could not make change." VM UserState)
-				      )
-				  )
+				  (buy-candy-h MergedVM UserState Owed Candy Change))
 				(@p "Not enough candy" VM UserState)
 				)
 			    (@p "Not enough money." VM UserState)
 			    )
-)
+  )

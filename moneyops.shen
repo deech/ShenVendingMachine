@@ -30,10 +30,14 @@
    coinStore -->
    coinStore -->
    (coinStore * coinStore)}
-  0 OldTill NewTill Change -> (@p (append NewTill OldTill) Change)
+  0 OldTill NewTill Change -> (@p (merge-tills NewTill OldTill) Change)
   Amount [] _ _ -> (error "Not enough in the till")
   Amount [(@p Coin CoinAmount) | Coins] NewTill Change ->
-            (change-h Amount Coins (merge-tills NewTill [(@p Coin CoinAmount)]) Change)
+            (change-h
+		    Amount
+		    Coins
+		    (merge-tills NewTill [(@p Coin CoinAmount)])
+		    (merge-tills Change [(@p Coin 0)]))
   	    where (> (faceValue Coin) Amount)
   Amount [(@p Coin CoinAmount) | Coins ] NewTill Change ->
             (let CoinsAndLeftover (/mod Amount (faceValue Coin))

@@ -23,7 +23,7 @@
   <e> := [];)
 (defcc <sudo>
   sudo;
-  := user;)
+  := [user];)
 (defcc <candy>    C := [C] where (element? C (value *candy*));)
 (defcc <currency> C := [C] where (element? C (value *currency*));)
 (defcc <candies>
@@ -33,8 +33,8 @@
   <currency> <currencies>;
   <currency>;)
 (defcc <inputs>
-  <candies>    := [candy   | [<candies>]   ];
-  <currencies> := [currency| [<currencies>]];)
+  <candies>    := [[candy   | [<candies>]   ]];
+  <currencies> := [[currency| [<currencies>]]];)
 (defcc <instruction>
   list <vending-machine-state>;
   add <inputs>;

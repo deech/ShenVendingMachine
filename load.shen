@@ -8,19 +8,12 @@
 (load "io.shen")
 (load "parser.shen")
 (tc +)
+(load "utils.shen")
 (load "vendingmachinetypes.shen")
 (load "moneyops.shen")
 (load "test.shen")
 (load "types.shen")
-(load "utils.shen")
 (load "vendingmachineops.shen")
 (tc -)
-(define startup
- -> (let Sock (open-socket "localhost" 8000)
-      (do (send-message (value *mailbox*) (value *initial-state*))
-          (add-to *thread-store* (make-thread (freeze (accept-connection Sock)))))))
-(define stop
-  -> (do (stop-server)
-	 nil))
-
+(load "startup.shen")
 (tc +)

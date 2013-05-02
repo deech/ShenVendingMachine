@@ -13,3 +13,16 @@
 	   (set *thread-store* [])
 	   (set *mailbox* (((protect READ-FROM-STRING) "SB-CONCURRENCY::MAKE-MAILBOX")))))
 )
+
+(define create-connector-type
+  TypeA X TypeB -> (let Datatype (gensym datatype)
+		        Connector (gensym connector)
+		       (eval [datatype Datatype
+			               _____________
+				       TypeA : Connector;
+
+				       TypeA : Connector;
+				       ___________________
+				       X : TypeB;])))
+
+(create-connector-type [currency X] X [list currency])

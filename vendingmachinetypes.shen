@@ -37,12 +37,4 @@
   [buy X] : command;
   _________________
   X : candy;
-
-  _______________________
-  [currency X] : command;
-
-
-  [currency X] : command;
-  _______________________
-  X : (list currency);
-  )
+ )

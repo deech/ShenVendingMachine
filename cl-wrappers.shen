@@ -23,8 +23,10 @@
 		         ((protect WRITE-LINE) Response Stream)
 			 ((protect WRITE-LINE) "============" Stream)
 			 ((protect FORCE-OUTPUT) Stream)))
+
 (define read-line
   Stream -> ((protect READ-LINE) Stream NIL NIL))
+
 (define wait-for-input
   Connection F UserState done -> ()
   Connection F UserState continue ->
@@ -38,12 +40,13 @@
 			      (value *mailbox*)
 			      (/. NewUserState (wait-for-input Connection F NewUserState continue)))))
       )
+
 (define wait-for-input-h
   (@p UserResponse NewVendingMachine NewUserState) Stream Mailbox RecursiveCall
     -> (do (write-to-stream Stream UserResponse)
 	   (send-message Mailbox NewVendingMachine)
-	   (RecursiveCall NewUserState))
-   A B C D -> (output "~A ~A ~A ~A" A B C D))
+	   (RecursiveCall NewUserState)))
+
 (define send-response
   (@p UserResponse NewVendingMachine) Stream Mailbox
        -> (do (write-to-stream Stream UserResponse)

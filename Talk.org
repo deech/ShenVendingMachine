@@ -1,0 +1,351 @@
+#+TITLE: Shen - Programming Language
+#+AUTHOR: Aditya Siram
+#+OPTIONS: toc:nil
+#+LaTeX_CLASS: beamer
+#+LaTeX_CLASS_OPTIONS: [presentation]
+#+LATEX_HEADER: \usepackage{tikz}
+#+LATEX_HEADER: \usepackage{tikz-qtree}
+#+LATEX_HEADER: \usepackage{subfigure}
+#+LATEX_HEADER: \usepackage{listings}
+#+LATEX_HEADER: \usepackage{color}
+#+LATEX_HEADER: \definecolor{lightgrey}{rgb}{0.7,0.7,0.7}
+#+LATEX_HEADER: \usetikzlibrary{arrows,shapes,trees,shapes.multipart}
+#+LATEX_HEADER: \tikzset{>=latex}
+#+LATEX_HEADER: \lstset{language=haskell,escapechar=\%, numbers=left, font=\ttfamily}
+#+BEAMER_HEADER_EXTRA: \usetheme{Madrid}\usecolortheme{default}
+#+BEAMER_FRAME_LEVEL: 1
+#+COLUMNS: %35ITEM %10BEAMER_env(Env) %10BEAMER_envargs(Env Args) %4BEAMER_col(Col) %8BEAMER_extra(Extra)
+
+* Cash & Candy
+** Setting variables
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  (set *candy* [snickers hersheys twix])
+  (set *currency* [quarter dime nickel dollar])
+  #+END_SRC
+
+** Getting variables
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  (value *candy*)
+    => [snickers hersheys twix]
+  #+END_SRC
+
+** Mutating variables
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  (set *candy* (append [payday] (value *candy*)))
+  (value *candy*)
+    => [payday snickers hersheys twix]
+  #+END_SRC
+
+* Pricing & Denominations
+** Notice type signatures
+** Denominations						      :BMCOL:
+  :PROPERTIES:
+  :BEAMER_env: block
+  :BEAMER_col: 0.45
+  :END:
+  #+BEGIN_SRC fundamental
+  (define faceValue
+    {currency --> number}
+    quarter -> 25
+    dime    -> 10
+    nickel  -> 5
+    dollar  -> 100)
+  #+END_SRC
+** Candy cost						      :BMCOL:B_block:
+   :PROPERTIES:
+   :BEAMER_col: 0.4
+   :BEAMER_env: block
+   :END:
+  #+BEGIN_SRC fundamental
+  (define candy-cost
+    {candy --> number}
+    snickers -> 100
+    twix     -> 125
+    hersheys -> 75
+    payday   -> 95)
+  #+END_SRC
+* Simple typing						      :B_block:BMCOL:
+** Typing Cash & Candy
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+   (datatype items
+     if (element? X (value *currency*)) \\ premise
+     ___________________________________
+     X : currency;                      \\ conclusion
+
+     if (element? X (value *candy*))
+     _______________________________
+     X : candy;)
+  #+END_SRC
+** Notice commenting syntax
+** Shen was developed on Windows
+* Parsing
+** a^{n > 0}						      :BMCOL:B_block:
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+   (defcc <as>
+     a <as>;
+     a;)
+   (compile (function <as>) [a a a])
+     => [a a a]
+   (compile (function <as>) [a a b])
+     => parse error
+  #+END_SRC
+* Parsing
+** a^{n > 0}b^{m > 0}
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+   (defcc <bs>
+     b <bs>;
+     b;)
+
+   (defcc <asbs>
+     <as> <bs>;)
+
+   (compile (function <asbs>) [a a a])
+     => parse error
+   (compile (function <as>) [a a b])
+     => [a a b]
+  #+END_SRC
+
+* Parsing
+** Vending Machine Grammar
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  (defcc <instruction>
+    list <vending-machine-state>;)
+
+  (defcc <vending-machine-state>
+    candy;
+    money;)
+  #+END_SRC
+
+** Try it!
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  > list money
+  > list candy
+  #+END_SRC
+* Parsing
+** Vending Machine Grammar
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  (defcc <instruction>
+    add <inputs>;)
+
+  (defcc <inputs> <currencies> := [[currency|[<currencies>]]];)
+
+  (defcc <currencies>
+      <currency> <currencies>; <currency>;)
+
+  (defcc <currency> C := [C]
+     where (element? C (value *currency*));)
+  #+END_SRC
+
+** Try it!
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  > add quarter dollar nickel
+  #+END_SRC
+* Parsing
+** Vending Machine Grammar
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  (defcc <instruction> ...;)
+  (defcc <sudo>
+     sudo;
+     := [user];)
+  (defcc <instructions>
+    <sudo> <instruction> := (append <sudo> [<instruction>]);)
+  #+END_SRC
+
+** Parsing to an AST
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+   (compile (function <instructions>) [add quarter dollar])
+    => [user [add [currency [quarter dollar]]]]
+   (compile (function <instructions>) [sudo add quarter dollar])
+    => [sudo [add [currency [quarter dollar]]]]
+  #+END_SRC
+* Internal Representation
+** Machine state
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  (@p [(@p snickers 2)
+       (@p twix 20)
+         ..]
+      [(@p dollar 3)
+       (@p quarter 10)
+         ...])
+  #+END_SRC
+** Types
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  (synonyms state      (candyStore * coinStore)
+            candyStore (list (candy * number))
+  	    coinStore  (list (currency * number)))
+  #+END_SRC
+
+* Adding coins
+** Add instruction
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  > add quarter dollar
+  #+END_SRC
+** Add coin routine
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+   (define add-coins
+     { coinStore --> (list currency) --> coinStore }
+     CoinStore []    -> CoinStore
+     CoinStore Coins -> (add-coins
+                            (add-coin CoinStore (head Coins))
+                            (tail Coins)))
+   (define add-coin
+     { coinStore --> currency --> coinStore}
+     CoinStore Coin -> (with-key CoinStore Coin (+ 1)))
+  #+END_SRC
+* Adding Coins
+** Updating A Lookup Table
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+   (define with-key
+     { (list (A * B)) --> A --> (B --> B) --> (list (A * B)) }
+     [(@p K V) | KVs] K F -> (append [(@p K (F V))]
+                                     (with-key KVs K F))
+     [KV | KVs] K F       -> (append [KV]
+                                     (with-key KVs K F))
+     [] K F               -> [])
+  #+END_SRC
+* Typing commands
+** Sample untyped commands from `defcc`
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+    > [sudo [add [currency [quarter dollar]]]]
+    > [user [list money]]
+  #+END_SRC
+** Typing a command
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+   (datatype command-line
+     __________________
+     [sudo X] : command-line;
+
+     ________________________
+     [user X] : command-line;)
+  #+END_SRC
+* Processing a command
+** Command processor
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  (define process-request
+    { state --> command-line --> state -->
+      (string * state * state)}
+    ...
+    VM [sudo [list money]] US -> (@p (show-coins VM) VM US)
+    VM [user [list money]] US -> (@p (show-coins US) VM US)
+    ...
+    )
+  #+END_SRC
+* Processing a command
+** Processing currencies
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  (define process-request
+    { state --> command-line --> state -->
+      (string * state * state)}
+      VM [user [add [currency Currencies]]] US
+               > (@p "Success."
+		      VM
+	             (@p (fst US)
+                         (add-coins (snd US) Currencies)))
+    )
+  #+END_SRC
+* Typing currency commands
+** Currency command type
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  ...
+  _______________________
+  [currency X] : command;
+
+
+  [currency X] : command;
+  _______________________
+  X : (list currency);
+
+  ...
+
+  #+END_SRC
+* Generating types
+** Generating currency command type
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  (define create-connector-type
+    A X B -> (let Datatype (gensym datatype)
+  		  Connector (gensym connector)
+  		(eval [datatype Datatype
+  			_____________
+  			A : Connector;
+
+  			A : Connector;
+  			______________
+  			X : B;])))
+  #+END_SRC
+
+** Example Usage
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  (create-connector-type [currency X] X [list currency])
+  #+END_SRC

@@ -1,6 +1,8 @@
-(declare startup [string --> unit])
+(include-all-but [buy-type currency-type candy-type])
 (define startup
- Host -> (let Sock (open-socket Host 8000)
-          (do (send-message (value *mailbox*) (value *initial-state*))
-	      (add-to *thread-store* (make-thread (freeze (accept-connection Sock))))
-	      "Success")))
+  {ip-address --> socket}
+  Host -> (let Sock (open-socket Host 8000)
+	       MessageSent (send-message (value *mailbox*) (value *initial-state*))
+	       ThreadStore (add-to *thread-store* (make-thread (freeze (accept-connection Sock))))
+	      Sock))
+

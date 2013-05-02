@@ -8,15 +8,16 @@
   X : user;)
 
 (datatype ip-address
-	  
-  (is-ip-address X):verified;
-  ____________________
-  X : ip-address;)
+
+  if (is-ip-address X) 
+  __________________________________
+  X : ip-address;
+ )
 
 (datatype socket
-  (is-socket X):verified;
-  _______________
-  X : socket;)
+
+  ______________________
+  (is-socket X) : verified >> X : socket;)
 
 (datatype network
   ___________________________
@@ -28,3 +29,27 @@
 
   ___________________
   [user X] : command-line;)
+
+
+(datatype globals
+  ____________________________
+  (value *initial-state*) : state;
+
+  _____________________________
+  (value *mailbox*) : mailbox;
+  )
+
+(datatype items
+
+  if (element? X (value *currency*))
+  ___________________________________
+  X : currency;
+
+  if (element? X (value *candy*))
+  _______________________________
+  X : candy;
+ )
+
+(synonyms state      (candyStore * coinStore)
+          candyStore (list (candy * number))
+	  coinStore  (list (currency * number)))

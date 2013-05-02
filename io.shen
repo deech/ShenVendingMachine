@@ -1,19 +1,7 @@
-(package nativeCalls (append (external cl-wrapper)
-                             (external initial)
-                             [ip-address
-			      socket
-			      open-socket
-			      accept-connection
-			      stop-server
-			      is-ip-address
-			      empty-state
-			      parse-command-line
-			      process-request])
-
 (declare open-socket [ip-address --> [number --> socket]])
-(declare accept-connection [symbol --> unit])
+(declare accept-connection [socket --> unit])
 (declare stop-server [--> unit])
-(declare get-server [--> symbol])
+(declare get-server [--> socket])
 (declare is-ip-address [string --> boolean])
 
 (define open-socket
@@ -45,6 +33,7 @@
 
 (define get-server
   -> (value *my-server*))
+
 (define is-ip-address
   X -> (or (not (= (trap-error
                          (compile
@@ -53,5 +42,4 @@
                                  (explode X)))
                          (/. E (fail)))
                    (fail)))
-           (= X "localhost")))
-)
+	   (= X "localhost")))

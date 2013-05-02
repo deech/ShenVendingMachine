@@ -335,7 +335,7 @@
 
         TypeA : Connector;
          _________________
-  	 X : (eval TypeB);]));
+  	 X : TypeB;]));
   #+END_SRC
 * Generating types
 ** Example Usage
@@ -343,7 +343,7 @@
   :BEAMER_env: block
   :END:
   #+BEGIN_SRC fundamental
-  (connect-type currency [currency X] X [list currency])
+  (connect-type currency [currency X] X (list currency))
   #+END_SRC
 ** Type Generated						      :BMCOL:
   :PROPERTIES:
@@ -359,7 +359,6 @@
     _____________________________
      X : (list currency);)
   #+END_SRC
-
 ** Type Required 						      :BMCOL:
   :PROPERTIES:
   :BEAMER_env: block
@@ -374,7 +373,6 @@
     ___________________
      X : (list currency);)
   #+END_SRC
-
 * Load Order
 ** Currency Macro loading
   :PROPERTIES:
@@ -441,7 +439,6 @@
   #+END_SRC
 ** Couldn't figure out the macro
 
-
 * Network Layer
 ** Wrapping socket listener
   :PROPERTIES:
@@ -483,3 +480,36 @@
   (freeze (do (... request-response loop ...)
               (... close connection ....    )))
   #+END_SRC
+
+* Typing CL Functions
+** An IP Address
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  if (is-ip-address X)
+  ____________________
+  X : ip-address;
+  #+END_SRC
+
+** Parsing an IP Address
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+(defcc <ip-address>
+  <octet-1> shen.<stop>
+  ..
+  <octet-4> := [<octet-1> <octet-2> <octet-3> <octet-4>];
+  <e>;)
+  #+END_SRC
+** Typing open-socket
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+(declare open-socket [ip-address --> [number --> socket]])
+  #+END_SRC
+* Conclusion
+** http://shenlanguage.org
+** http://github.com/deech/ShenVendingMachine

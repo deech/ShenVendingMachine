@@ -1,4 +1,5 @@
 (package initial [*candy* *currency* quarter dime nickel dollar snickers payday hersheys twix *mailbox* *connectionStore* *thread-store* add-to reset *initial-state*]
+  (declare add-to [A --> [B --> unit]])
   (set *candy* [payday snickers hersheys twix])
   (set *currency* [quarter dime nickel dollar])
   (set *connectionStore* [])
@@ -13,16 +14,3 @@
 	   (set *thread-store* [])
 	   (set *mailbox* (((protect READ-FROM-STRING) "SB-CONCURRENCY::MAKE-MAILBOX")))))
 )
-
-(define create-connector-type
-  TypeA X TypeB -> (let Datatype (gensym datatype)
-		        Connector (gensym connector)
-		       (eval [datatype Datatype
-			               _____________
-				       TypeA : Connector;
-
-				       TypeA : Connector;
-				       ___________________
-				       X : TypeB;])))
-
-\\  (create-connector-type [currency X] X [list currency])

@@ -1,10 +1,9 @@
 (defmacro connector-type-macro
   [connect-type Name TypeA X TypeB] ->
-    (let Connector (gensym connector-)
      [datatype Name
         _________________
-	 TypeA : Connector;
+	TypeA : Name;
 
-        TypeA : Connector;
+        TypeA : Name;
 	 __________
-	 X : (eval TypeB);]));
+	 X : TypeB;]);

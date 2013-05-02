@@ -1,9 +1,9 @@
 (load "native-calls.shen")
 (load-lisp "/home/deech/Lisp/shenScripts/VendingMachine/cl-libs.lsp")
-(package cl-wrapper [*mailbox* socket-listen socket-accept socket-close pass-on-input connection-name make-thread kill-thread send-message receive-message is-socket]
-(declare socket-listen [ip-address --> [number --> socket]])
-(declare socket-accept [socket --> unit])
-(declare socket-close [socket --> unit])
+(declare socket-listen [ip-address --> [number --> unit]])
+(declare socket-accept [unit --> unit])
+(declare socket-close [unit --> unit])
+(declare send-message [mailbox --> [state --> unit]])
 (define socket-listen
   Host Port -> (((protect READ-FROM-STRING) "USOCKET::SOCKET-LISTEN")
 		Host
@@ -69,4 +69,3 @@
   Mailbox -> (((protect READ-FROM-STRING) "SB-CONCURRENCY::RECEIVE-MESSAGE") Mailbox))
 (define send-message
   Mailbox Message -> (((protect READ-FROM-STRING) "SB-CONCURRENCY::SEND-MESSAGE") Mailbox Message))
-)

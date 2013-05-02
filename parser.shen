@@ -39,6 +39,7 @@
   list <vending-machine-state>;
   add <inputs>;
   buy <candy>;
+  help;
   cancel;)
 (defcc <vending-machine-state>
   candy;

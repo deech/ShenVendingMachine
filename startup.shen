@@ -1,4 +1,4 @@
-(declare startup [--> unit])
+(declare startup [string --> unit])
 (define startup
  Host -> (let Sock (open-socket Host 8000)
           (do (send-message (value *mailbox*) (value *initial-state*))

@@ -11,9 +11,25 @@
   (@p Candy _) -> (show-alist
 			(map
 			 (/. CandyStock (@p (fst CandyStock)
-					    [(snd CandyStock)
-					     (candy-cost (fst CandyStock))]))
+					    (make-string "[~A ~A]"
+						  (snd CandyStock)
+					          (print-money (candy-cost (fst CandyStock))))))
 			 Candy)))
+
+
+(define show-help
+  { --> string }
+  ->
+(make-string "~A~%"
+"
+list money                     - your balance
+add quarter dollar ...         - add to your balance
+buy hersheys                   - get a hersheys
+cancel                         - return money
+list candy                     - show available candy
+sudo add hersheys snickers ... - restock candy
+sudo add quarter dollar ..     - restock change
+help                           - this message"))
 
 (define process-request
   { state --> command-line --> state --> (string * state * state)}
@@ -39,6 +55,8 @@
   VM [user [cancel]] US -> (@p (make-string "Returning:~%~A" (show-coins US))
 			       VM
 			       (empty-state))
+  VM [sudo [help]]   US -> (@p (show-help) VM US)
+  VM [user [help]]   US -> (@p (show-help) VM US)
   )
 
 (define remove-candy
@@ -112,7 +130,7 @@
 	   (@p (remove-candy Candy (fst VM)) NewTill)
 	   (@p (fst UserState) (pad-coinStore Change)))
   )
-     
+
 (define pad-coinStore
   {coinStore --> coinStore}
   CoinStore -> (merge-alists CoinStore (snd (empty-state)) +))

@@ -312,40 +312,174 @@
   :BEAMER_env: block
   :END:
   #+BEGIN_SRC fundamental
-  ...
-  _______________________
-  [currency X] : command;
+  (datatype currency
+    _______________________
+    [currency X] : blah;
 
-
-  [currency X] : command;
-  _______________________
-  X : (list currency);
-
-  ...
-
+    [currency X] : blah;
+    _______________________
+    X : (list currency);)
   #+END_SRC
 * Generating types
-** Generating currency command type
+** Generating currency command type			      :BMCOL:B_block:
   :PROPERTIES:
   :BEAMER_env: block
   :END:
   #+BEGIN_SRC fundamental
-  (define create-connector-type
-    A X B -> (let Datatype (gensym datatype)
-  		  Connector (gensym connector)
-  		(eval [datatype Datatype
-  			_____________
-  			A : Connector;
+  (defmacro connector-type-macro
+    [connect-type Name TypeA X TypeB] ->
+      (let Connector (gensym connector-)
+       [datatype Name
+        _________________
+        TypeA : Connector;
 
-  			A : Connector;
-  			______________
-  			X : B;])))
+        TypeA : Connector;
+         _________________
+  	 X : (eval TypeB);]));
   #+END_SRC
-
+* Generating types
 ** Example Usage
   :PROPERTIES:
   :BEAMER_env: block
   :END:
   #+BEGIN_SRC fundamental
-  (create-connector-type [currency X] X [list currency])
+  (connect-type currency [currency X] X [list currency])
+  #+END_SRC
+** Type Generated						      :BMCOL:
+  :PROPERTIES:
+  :BEAMER_env: block
+  :BEAMER_col: 0.55
+  :END:
+  #+BEGIN_SRC fundamental
+  (datatype currency
+    ____________________________
+    [currency X] : connector-3047;
+
+    [currency X] : connector-3047;
+    _____________________________
+     X : (list currency);)
+  #+END_SRC
+
+** Type Required 						      :BMCOL:
+  :PROPERTIES:
+  :BEAMER_env: block
+  :BEAMER_col: 0.4
+  :END:
+  #+BEGIN_SRC fundamental
+  (datatype currency
+    ___________________
+    [currency X] : blah;
+
+    [currency X] : blah;
+    ___________________
+     X : (list currency);)
+  #+END_SRC
+
+* Load Order
+** Currency Macro loading
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+(tc -)                              \\ turn off typechecking
+(defmacro connector-type-macro ...) \\ declare macro
+(tc +)                              \\ turn on typechecking
+(connect-type [currency X] ...)     \\ generate type
+(define process-request ...)        \\ use type
+  #+END_SRC
+
+* Concurrency Layer
+** Each connection gets a thread
+** Each thread has a state
+  #+BEGIN_SRC fundamental
+  (candyStore * coinStore)
+  #+END_SRC
+** Each connection is stored globally in:
+  #+BEGIN_SRC fundamental
+  *connectionStore*
+  #+END_SRC
+** Synchronized via SBCL's mailbox
+* Concurrency Layer
+** Global Mailbox For Concurrency
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  (set *mailbox* (((protect READ-FROM-STRING)
+                  "SB-CONCURRENCY::MAKE-MAILBOX")))
+  #+END_SRC
+** Sending/Receiving a message
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+(define send-message
+  Mailbox Message -> (((protect READ-FROM-STRING)
+                      "SB-CONCURRENCY::SEND-MESSAGE")
+                          Mailbox Message))
+(define receive-message
+  Mailbox -> (((protect READ-FROM-STRING)
+               "SB-CONCURRENCY::RECEIVE-MESSAGE")
+                  Mailbox))
+  #+END_SRC
+
+* CL Interop
+** In Common Lisp
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  (package-name:function arg1 arg2 ...)
+  #+END_SRC
+** Same thing in Shen
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+  (((protect READ-FROM-STRING) "PACKAGE-NAME::FUNCTION")
+        arg1 arg2 ..)
+  #+END_SRC
+** Couldn't figure out the macro
+
+
+* Network Layer
+** Wrapping socket listener
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+(define socket-listen
+  Host Port -> (((protect READ-FROM-STRING)
+                   "USOCKET::SOCKET-LISTEN")
+		Host
+		Port))
+  #+END_SRC
+** Calling from Shen
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+(define open-socket
+  Host Port -> (let Sock (socket-listen Host Port)
+		 (do (add-to *connectionStore* Sock)
+		     Sock)))
+  #+END_SRC
+* Threading
+** Wrapping thread maker
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+(define make-thread
+  Function -> (((protect READ-FROM-STRING)
+         "SB-THREAD::MAKE-THREAD") Function))
+  #+END_SRC
+** Creating a thread
+  :PROPERTIES:
+  :BEAMER_env: block
+  :END:
+  #+BEGIN_SRC fundamental
+(make-thread
+  (freeze (do (... request-response loop ...)
+              (... close connection ....    )))
   #+END_SRC

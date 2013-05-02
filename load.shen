@@ -7,6 +7,7 @@
 (load "initial.shen")
 (load "io.shen")
 (load "parser.shen")
+(load "macros.shen")
 (tc +)
 (load "utils.shen")
 (load "vendingmachinetypes.shen")

@@ -12,6 +12,11 @@
   ____________________
   X : ip-address;)
 
+(datatype socket
+  if (IS-STREAMING-SOCKET X)
+  ________________
+  X : socket;)
+
 (datatype network
   ___________________________
   (value *my-server*) : socket;)

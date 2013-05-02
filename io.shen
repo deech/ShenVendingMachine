@@ -10,7 +10,7 @@
 			      parse-command-line
 			      process-request])
 
-(declare open-socket [ip-address --> [number --> socket]])
+(declare open-socket [ip-address --> [number --> unit]])
 (declare accept-connection [symbol --> unit])
 (declare stop-server [--> unit])
 (declare get-server [--> symbol])

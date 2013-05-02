@@ -38,3 +38,5 @@
   _________________
   X : candy;
  )
+
+(connect-type currency-type [currency X] X [list currency])

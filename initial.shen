@@ -25,4 +25,4 @@
 				       ___________________
 				       X : TypeB;])))
 
-(create-connector-type [currency X] X [list currency])
+\\  (create-connector-type [currency X] X [list currency])

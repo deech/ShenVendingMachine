@@ -10,7 +10,7 @@
 			      parse-command-line
 			      process-request])
 
-(declare open-socket [ip-address --> [number --> unit]])
+(declare open-socket [ip-address --> [number --> socket]])
 (declare accept-connection [symbol --> unit])
 (declare stop-server [--> unit])
 (declare get-server [--> symbol])
@@ -20,6 +20,7 @@
   Host Port -> (let Sock (socket-listen Host Port)
 		 (do (add-to *connectionStore* Sock)
 		     Sock)))
+
 (define accept-connection
   Sock -> (let Accepted (socket-accept Sock)
             (do (add-to *connectionStore* Accepted)

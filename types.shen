@@ -8,13 +8,14 @@
   X : user;)
 
 (datatype ip-address
-  if (is-ip-address X)
+	  
+  (is-ip-address X):verified;
   ____________________
   X : ip-address;)
 
 (datatype socket
-  if (IS-STREAMING-SOCKET X)
-  ________________
+  (is-socket X):verified;
+  _______________
   X : socket;)
 
 (datatype network

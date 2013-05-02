@@ -3,12 +3,6 @@
 	  coinStore  (list (currency * number)))
 
 (datatype globals
-  _____________________________
-  (value *candy*) : (list candy);
-
-  ____________________________________
-  (value *currency*) : (list currency);
-
   ____________________________
   (value *initial-state*) : state;
   )
@@ -37,6 +31,8 @@
   [buy X] : command;
   _________________
   X : candy;
+
+  
  )
 
 (connect-type currency-type [currency X] X [list currency])

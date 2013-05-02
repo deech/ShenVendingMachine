@@ -13,7 +13,7 @@
 			 (/. CandyStock (@p (fst CandyStock)
 					    (make-string "[~A ~A]"
 						  (snd CandyStock)
-					          (print-money (candy-cost (fst CandyStock))))))
+					          (candy-cost (fst CandyStock)))))
 			 Candy)))
 
 
